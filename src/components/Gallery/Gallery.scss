@@ -7,7 +7,7 @@
 
 .gallery__images-card {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   margin-right: 30px;
   margin-bottom: 50px;
