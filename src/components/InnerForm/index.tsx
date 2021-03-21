@@ -25,9 +25,7 @@ const getGifDataFromApi = async (gifTag: string) => {
   return { tag: gifTag, gifData };
 };
 
-const InnerForm: React.FC<{ additionalClasses: string }> = (
-  { additionalClasses } : { additionalClasses: string },
-) => {
+const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
   const dispatch = useAppDispatch();
   const formData = useAppSelector((state) => state.innerForm);
   const inputRef = createRef<HTMLInputElement>();
