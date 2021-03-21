@@ -1,0 +1,13 @@
+.inner-form {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+
+  input {
+    margin-bottom: 10px;
+  }
+
+  button[type="submit"] {
+    margin-left: 10px;
+  }
+}

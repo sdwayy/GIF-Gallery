@@ -1,0 +1,7 @@
+.control-bar {
+  align-items: baseline;
+
+  .btn:not(:last-of-type) {
+    margin-right: 10px;
+  }
+}

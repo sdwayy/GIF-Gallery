@@ -1,0 +1,10 @@
+.notification {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  p {
+    word-break: break-word;
+  }
+}
