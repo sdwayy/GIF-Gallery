@@ -7,6 +7,7 @@ import { useAppSelector, useAppDispatch } from '../../hooks';
 import { addImage } from '../../slices/gallery';
 import { showNotification } from '../../slices/notification';
 import { changeStatus, setValue } from '../../slices/innerForm';
+import { ImageType } from '../../types';
 
 const KEY_WORD_FOR_AUTOUPDATE: string = 'delay';
 const AUTOUPDATE_DELAY_MS = 5000;
@@ -21,27 +22,7 @@ const getGifDataFromApi = async (gifTag: string) => {
       throw new Error(`Произошла HTTP ошибка: ${error.message}`);
     });
 
-  if (gifData.data.length === 0) {
-    throw new Error(`По тегу ${gifTag} ничего не найдено`);
-  }
-
   return { tag: gifTag, gifData };
-};
-
-const getGifsData = async (tags: Array<string>) => {
-  const promises = tags.map((tag) => getGifDataFromApi(tag));
-  const associatedId = Date.now();
-
-  const gifsData: any = await Promise.all(promises)
-    .then((value) => value);
-
-  const result = gifsData.map(({ gifData: { data }, tag }: any) => ({
-    tag,
-    url: data.image_url,
-    associatedId,
-  }));
-
-  return result;
 };
 
 const InnerForm: React.FC<{ additionalClasses: string }> = (
@@ -61,15 +42,31 @@ const InnerForm: React.FC<{ additionalClasses: string }> = (
     }
   });
 
+  const getGifsData = async (tags: Array<string>) => {
+    const promises = tags.map((tag) => getGifDataFromApi(tag));
+    const associatedId = Date.now();
+    const result: Array<ImageType> = [];
+    const gifsData: any = await Promise.all(promises);
+
+    gifsData.forEach((
+      { tag, gifData: { data } } : { tag: string, gifData: any },
+    ) => {
+      if (data.length === 0) {
+        dispatch(showNotification(`По тегу ${tag} ничего не найдено`));
+      } else {
+        result.push({ tag, associatedId, url: data.image_url });
+      }
+    });
+
+    return result;
+  };
+
   const updateGallery = async (gifTag: string) => {
     const tags = gifTag.split(',');
 
     try {
-      const imagesData = await getGifsData(tags);
-
-      imagesData.forEach((
-        imageData: { url: string, tag: string, associatedImageId: number },
-      ) => dispatch(addImage(imageData)));
+      const gifsData = await getGifsData(tags);
+      gifsData.forEach((gifData) => dispatch(addImage(gifData)));
     } catch (error) {
       dispatch(showNotification(error.message));
     }
