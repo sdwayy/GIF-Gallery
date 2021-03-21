@@ -9,12 +9,12 @@ import { showNotification } from '../../slices/notification';
 import { changeStatus, setValue } from '../../slices/innerForm';
 import { ImageType } from '../../types';
 
-const KEY_WORD_FOR_AUTOUPDATE: string = 'delay';
+const KEY_WORD_FOR_AUTOUPDATE = 'delay';
 const AUTOUPDATE_DELAY_MS = 5000;
+const API_KEY = '1fvGjMHdW85x3VmAklanxUniZW7thdEy';
 
-const getGifDataFromApi = async (gifTag: string) => {
-  const API_KEY: string = '1fvGjMHdW85x3VmAklanxUniZW7thdEy';
-  const getUrl = (tag: string) => `https://api.giphy.com/v1/gifs/random?api_key=${API_KEY}&tag=${tag}`;
+const getGifDataFromApi = async (gifTag: string, apiKey: string) => {
+  const getUrl = (tag: string) => `https://api.giphy.com/v1/gifs/random?api_key=${apiKey}&tag=${tag}`;
 
   const gifData = await fetch(getUrl(gifTag))
     .then((response) => response.json())
@@ -41,7 +41,7 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
   });
 
   const getGifsData = async (tags: Array<string>) => {
-    const promises = tags.map((tag) => getGifDataFromApi(tag));
+    const promises = tags.map((tag) => getGifDataFromApi(tag, API_KEY));
     const associatedId = Date.now();
     const result: Array<ImageType> = [];
     const gifsData: any = await Promise.all(promises);
