@@ -93,7 +93,10 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
       tag: { value: string };
     };
 
-    const tagInputValue = formElement.tag.value;
+    const tagInputValue = formElement
+      .tag
+      .value
+      .toLowerCase();
 
     if (tagInputValue === '') {
       dispatch(showNotification("Заполните поле 'тег'"));
