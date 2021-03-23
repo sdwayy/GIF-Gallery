@@ -80,10 +80,12 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
 
   const changeHandler = (evt: ChangeEvent) => {
     const inputValue = (evt.target as HTMLInputElement).value;
-    const validatedValue = inputValue
-      .replace(/[^a-z,]/iu, '');
 
-    dispatch(setValue(validatedValue));
+    const sanitazedValue = inputValue
+      .replace(/[^a-z,]/iu, '')
+      .replace(/,+/g, ',');
+
+    dispatch(setValue(sanitazedValue));
   };
 
   const submitHandler = async (evt: SyntheticEvent) => {
