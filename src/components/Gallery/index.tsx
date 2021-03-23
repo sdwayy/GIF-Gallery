@@ -12,7 +12,15 @@ function ImagesCard({ imagesData }: { imagesData: Array<ImageType> }) {
   const images = imagesData.map(({ tag, url }) => {
     const clickHandler = () => dispatch(setInnerFormValue(tag));
 
-    return <img key={url} src={url} alt={tag} onClick={clickHandler} />;
+    return (
+      <img
+        key={url}
+        src={url}
+        alt={tag}
+        width="200"
+        onClick={clickHandler}
+      />
+    );
   });
 
   return (
