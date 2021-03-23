@@ -60,7 +60,9 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
   };
 
   const updateGallery = async (gifTag: string) => {
-    const tags = gifTag.split(',');
+    const tags = gifTag
+      .split(',')
+      .filter((tag) => tag !== '');
 
     try {
       const gifsData = await getGifsData(tags);
@@ -82,8 +84,7 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
     const inputValue = (evt.target as HTMLInputElement).value;
 
     const sanitazedValue = inputValue
-      .replace(/[^a-z,]/iu, '')
-      .replace(/,+/g, ',');
+      .replace(/[^a-z,]/iu, '');
 
     dispatch(setValue(sanitazedValue));
   };
