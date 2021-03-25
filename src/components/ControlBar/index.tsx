@@ -4,30 +4,23 @@ import { Button, ButtonGroup } from 'react-bootstrap';
 import { clearGallery, toggleGroup } from '../../slices/gallery';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 
-const ControlBar: React.FC = () => {
+export default function ControlBar() {
   const dispatch = useAppDispatch();
   const galleryIsGrouped: boolean = useAppSelector(
     (state) => state.gallery.isGrouped,
   );
 
-  const onClearBtnClick = (): void => {
-    dispatch(clearGallery());
-  };
-
-  const onGroupBtnClick = (): void => {
-    dispatch(toggleGroup());
-  };
+  const clearBtnClickHandler = () => dispatch(clearGallery());
+  const grouptBtnClickHandler = () => dispatch(toggleGroup());
 
   return (
     <ButtonGroup className="control-bar">
-      <Button variant="danger" onClick={onClearBtnClick}>
+      <Button variant="danger" onClick={clearBtnClickHandler}>
         Очистить
       </Button>
-      <Button variant="info" onClick={onGroupBtnClick}>
+      <Button variant="info" onClick={grouptBtnClickHandler}>
         { galleryIsGrouped ? 'Разгруппировать' : 'Группировать' }
       </Button>
     </ButtonGroup>
   );
-};
-
-export default ControlBar;
+}

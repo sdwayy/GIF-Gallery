@@ -4,7 +4,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { closeNotification } from '../../slices/notification';
 import { useAppSelector, useAppDispatch } from '../../hooks';
 
-const Notification: React.FC = () => {
+export default function Notification() {
   const dispatch = useAppDispatch();
   const notificationData = useAppSelector((state) => state.notification);
   const { isActive, extra: text } = notificationData;
@@ -19,6 +19,4 @@ const Notification: React.FC = () => {
       </Modal.Body>
     </Modal>
   );
-};
-
-export default Notification;
+}

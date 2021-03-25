@@ -1,70 +1,48 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events,
-jsx-a11y/no-noninteractive-element-interactions */
 import './Gallery.scss';
 import React from 'react';
-import { setValue as setInnerFormValue } from '../../slices/innerForm';
-import { useAppSelector, useAppDispatch } from '../../hooks';
+import { useAppSelector } from '../../hooks';
 import { ImageType } from '../../types';
+import ImagesCard from './ImagesCard';
+import CardsGroup from './CardsGroup';
 
-function ImagesCard({ imagesData }: { imagesData: Array<ImageType> }) {
-  const dispatch = useAppDispatch();
+const getImagesCards = (globalImagesData: ImageType[]) => {
+  const associatedIdList = globalImagesData.map((data) => data.associatedId);
+  const uniqAssociatedIdList = [...new Set(associatedIdList)];
 
-  const images = imagesData.map(({ tag, url }) => {
-    const clickHandler = () => dispatch(setInnerFormValue(tag));
+  const cards = uniqAssociatedIdList.map((id) => {
+    const imagesDatasForThisId = globalImagesData
+      .filter(({ associatedId }) => associatedId === id);
+
+    return <ImagesCard key={id} imagesData={imagesDatasForThisId} />;
+  });
+
+  return cards;
+};
+
+const getCardsGroups = (globalImagesData: ImageType[]) => {
+  const tags = globalImagesData.map((imageData) => imageData.tag);
+  const uniqTags = [...new Set(tags)];
+
+  const cardsGroups = uniqTags.map((uniqTag) => {
+    const groupData = globalImagesData.filter(({ tag }) => tag === uniqTag);
+    const groupTitle = uniqTag.toLowerCase();
+    const imagesCardsForThisGroup = getImagesCards(groupData);
 
     return (
-      <img
-        key={url}
-        src={url}
-        alt={tag}
-        width="200"
-        onClick={clickHandler}
+      <CardsGroup
+        groupTitle={groupTitle}
+        imagesCardsForThisGroup={imagesCardsForThisGroup}
+        key={`${uniqTag}-group`}
       />
     );
   });
 
-  return (
-    <div className="gallery__images-card">
-      {images}
-    </div>
-  );
-}
-
-const getImagesCards = (imagesData: Array<ImageType>) => {
-  const associatedCardsId = imagesData.map((data) => data.associatedId);
-  const uniqAssociatedCardsId = [...new Set(associatedCardsId)];
-
-  const deck = uniqAssociatedCardsId.map((id) => {
-    const data = imagesData
-      .filter(({ associatedId }) => associatedId === id);
-
-    return <ImagesCard key={id} imagesData={data} />;
-  });
-
-  return deck;
+  return cardsGroups;
 };
 
-const getImagesGroups = (imagesData: Array<ImageType>) => {
-  const names = imagesData.map((imageData) => imageData.tag);
-  const uniqNames = [...new Set(names)];
-  const groups = uniqNames.map((name: string) => {
-    const groupData = imagesData
-      .filter(({ tag }) => tag === name);
-
-    return (
-      <div className="gallery__images-group" key={`${name}-group`}>
-        <h2>{name.toUpperCase()}</h2>
-        { getImagesCards(groupData) }
-      </div>
-    );
-  });
-
-  return groups;
-};
-
-const Gallery: React.FC = () => {
-  const data = useAppSelector((state) => state.gallery);
-  const { images: imagesData, isGrouped } = data;
+export default function Gallery() {
+  const galleryData = useAppSelector((state) => state.gallery);
+  const { images: imagesData, isGrouped } = galleryData;
 
   return (
     imagesData.length > 0
@@ -72,13 +50,11 @@ const Gallery: React.FC = () => {
         <section className="gallery">
           {
             isGrouped
-              ? getImagesGroups(imagesData)
+              ? getCardsGroups(imagesData)
               : getImagesCards(imagesData)
           }
         </section>
       )
       : null
   );
-};
-
-export default Gallery;
+}

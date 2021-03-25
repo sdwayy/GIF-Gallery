@@ -9,10 +9,6 @@ import { showNotification } from '../../slices/notification';
 import { changeStatus, setValue } from '../../slices/innerForm';
 import { ImageType } from '../../types';
 
-const KEY_WORD_FOR_AUTOUPDATE = 'delay';
-const AUTOUPDATE_DELAY_MS = 5000;
-const API_KEY = '1fvGjMHdW85x3VmAklanxUniZW7thdEy';
-
 const getGifDataFromApi = async (gifTag: string, apiKey: string) => {
   const getUrl = (tag: string) => `https://api.giphy.com/v1/gifs/random?api_key=${apiKey}&tag=${tag}`;
 
@@ -25,10 +21,22 @@ const getGifDataFromApi = async (gifTag: string, apiKey: string) => {
   return { tag: gifTag, gifData };
 };
 
-const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
+type InnerFormProps = {
+  keyWordForAutoupdate: string,
+  autoupdateDelayMS: number,
+  apiKey: string,
+};
+
+export default function InnerForm(props: InnerFormProps) {
   const dispatch = useAppDispatch();
   const formData = useAppSelector((state) => state.innerForm);
   const inputRef = createRef<HTMLInputElement>();
+
+  const {
+    keyWordForAutoupdate,
+    autoupdateDelayMS,
+    apiKey,
+  } = props;
 
   const { value: formValue, status: formStatus } = formData;
 
@@ -40,14 +48,14 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
     }
   });
 
-  const getGifsData = async (tags: Array<string>) => {
-    const promises = tags.map((tag) => getGifDataFromApi(tag, API_KEY));
+  const getGifsData = async (tags: string[]) => {
+    const promises = tags.map((tag) => getGifDataFromApi(tag, apiKey));
     const associatedId = Date.now();
-    const result: Array<ImageType> = [];
+    const result: ImageType[] = [];
     const gifsData: any = await Promise.all(promises);
 
     gifsData.forEach((
-      { tag, gifData: { data } } : { tag: string, gifData: any },
+      { tag, gifData: { data } }: { tag: string, gifData: any },
     ) => {
       if (data.length === 0) {
         dispatch(showNotification(`По тегу ${tag} ничего не найдено`));
@@ -60,11 +68,11 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
   };
 
   const updateGallery = async (gifTag: string) => {
-    const tags = gifTag
-      .split(',')
-      .filter((tag) => tag !== '');
-
     try {
+      const tags = gifTag
+        .split(',')
+        .filter((tag) => tag !== '');
+
       const gifsData = await getGifsData(tags);
       gifsData.forEach((gifData) => dispatch(addImage(gifData)));
     } catch (error) {
@@ -78,9 +86,9 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
         autoUpdate();
       })
       .catch((error) => dispatch(showNotification(`Autoupdate failed: ${error}`)));
-  }, AUTOUPDATE_DELAY_MS);
+  }, autoupdateDelayMS);
 
-  const changeHandler = (evt: ChangeEvent) => {
+  const inputChangeHandler = (evt: ChangeEvent) => {
     const inputValue = (evt.target as HTMLInputElement).value;
 
     const sanitazedValue = inputValue
@@ -108,7 +116,7 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
 
     dispatch(changeStatus('process'));
 
-    if (tagInputValue === KEY_WORD_FOR_AUTOUPDATE) {
+    if (tagInputValue === keyWordForAutoupdate) {
       autoUpdate();
     } else {
       updateGallery(tagInputValue)
@@ -120,12 +128,12 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
   };
 
   return (
-    <Form className={`inner-form ${additionalClasses}`} onSubmit={submitHandler}>
+    <Form className="inner-form app__inner-form" onSubmit={submitHandler}>
       <Form.Control
         className="form-control"
         name="tag"
         placeholder="Введите тег"
-        onChange={changeHandler}
+        onChange={inputChangeHandler}
         value={formValue}
         ref={inputRef}
       />
@@ -138,6 +146,4 @@ const InnerForm = ({ additionalClasses } : { additionalClasses: string }) => {
       </Button>
     </Form>
   );
-};
-
-export default InnerForm;
+}
