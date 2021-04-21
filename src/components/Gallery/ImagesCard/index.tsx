@@ -2,8 +2,8 @@
 jsx-a11y/no-noninteractive-element-interactions */
 import React from 'react';
 import { setValue as setInnerFormValue } from '../../../slices/innerForm';
-import { useAppDispatch } from '../../../hooks';
-import { ImageType } from '../../../types';
+import { useAppDispatch } from '../../../core/hooks';
+import { ImageType } from '../../../core/types';
 
 type ImagesCardProps = {
   imagesData: ImageType[],

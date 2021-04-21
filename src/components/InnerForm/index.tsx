@@ -2,43 +2,21 @@ import './InnerForm.scss';
 import React, {
   ChangeEvent, SyntheticEvent, useEffect, createRef,
 } from 'react';
+import { useSelector } from 'react-redux';
 import { Button, Form } from 'react-bootstrap';
-import { useAppSelector, useAppDispatch } from '../../hooks';
-import { addImage } from '../../slices/gallery';
+import { useAppSelector, useAppDispatch } from '../../core/hooks';
+import { RootState } from '../../core/store';
+import { getGifsData } from '../../slices/gallery';
 import { showNotification } from '../../slices/notification';
-import { changeStatus, setValue } from '../../slices/innerForm';
-import { ImageType } from '../../types';
+import { setValue } from '../../slices/innerForm';
 
-const getGifDataFromApi = async (gifTag: string, apiKey: string) => {
-  const getUrl = (tag: string) => `https://api.giphy.com/v1/gifs/random?api_key=${apiKey}&tag=${tag}`;
-
-  const gifData = await fetch(getUrl(gifTag))
-    .then((response) => response.json())
-    .catch((error) => {
-      throw new Error(`Произошла HTTP ошибка: ${error.message}`);
-    });
-
-  return { tag: gifTag, gifData };
-};
-
-type InnerFormProps = {
-  keyWordForAutoupdate: string,
-  autoupdateDelayMS: number,
-  apiKey: string,
-};
-
-export default function InnerForm(props: InnerFormProps) {
+export default function InnerForm() {
   const dispatch = useAppDispatch();
   const formData = useAppSelector((state) => state.innerForm);
   const inputRef = createRef<HTMLInputElement>();
+  const loadState = useSelector((state: RootState) => state.gallery.load);
 
-  const {
-    keyWordForAutoupdate,
-    autoupdateDelayMS,
-    apiKey,
-  } = props;
-
-  const { value: formValue, status: formStatus } = formData;
+  const { value: formValue } = formData;
 
   useEffect(() => {
     const input = inputRef.current;
@@ -47,46 +25,6 @@ export default function InnerForm(props: InnerFormProps) {
       input.focus();
     }
   });
-
-  const getGifsData = async (tags: string[]) => {
-    const promises = tags.map((tag) => getGifDataFromApi(tag, apiKey));
-    const associatedId = Date.now();
-    const result: ImageType[] = [];
-    const gifsData: any = await Promise.all(promises);
-
-    gifsData.forEach((
-      { tag, gifData: { data } }: { tag: string, gifData: any },
-    ) => {
-      if (data.length === 0) {
-        dispatch(showNotification(`По тегу ${tag} ничего не найдено`));
-      } else {
-        result.push({ tag, associatedId, url: data.image_url });
-      }
-    });
-
-    return result;
-  };
-
-  const updateGallery = async (gifTag: string) => {
-    try {
-      const tags = gifTag
-        .split(',')
-        .filter((tag) => tag !== '');
-
-      const gifsData = await getGifsData(tags);
-      gifsData.forEach((gifData) => dispatch(addImage(gifData)));
-    } catch (error) {
-      dispatch(showNotification(error.message));
-    }
-  };
-
-  const autoUpdate = () => setTimeout(() => {
-    updateGallery('random')
-      .then(() => {
-        autoUpdate();
-      })
-      .catch((error) => dispatch(showNotification(`Autoupdate failed: ${error}`)));
-  }, autoupdateDelayMS);
 
   const inputChangeHandler = (evt: ChangeEvent) => {
     const inputValue = (evt.target as HTMLInputElement).value;
@@ -110,21 +48,11 @@ export default function InnerForm(props: InnerFormProps) {
       .toLowerCase();
 
     if (tagInputValue === '') {
-      dispatch(showNotification("Заполните поле 'тег'"));
+      dispatch(showNotification({ source: 'innerForm', text: "Заполните поле 'тег'" }));
       return;
     }
 
-    dispatch(changeStatus('process'));
-
-    if (tagInputValue === keyWordForAutoupdate) {
-      autoUpdate();
-    } else {
-      updateGallery(tagInputValue)
-        .then(() => {
-          dispatch(changeStatus('fulfilled'));
-        })
-        .catch((error) => dispatch(showNotification(error)));
-    }
+    dispatch(getGifsData(tagInputValue));
   };
 
   return (
@@ -138,11 +66,11 @@ export default function InnerForm(props: InnerFormProps) {
         ref={inputRef}
       />
       <Button
-        variant={formStatus === 'process' ? 'warning' : 'success'}
+        variant={loadState === 'process' ? 'warning' : 'success'}
         type="submit"
-        disabled={formStatus === 'process'}
+        disabled={loadState === 'process'}
       >
-        {formStatus === 'process' ? 'Загрузка...' : 'Загрузить'}
+        {loadState === 'process' ? 'Загрузка...' : 'Загрузить'}
       </Button>
     </Form>
   );

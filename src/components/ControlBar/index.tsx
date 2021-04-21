@@ -2,7 +2,7 @@ import React from 'react';
 import './ControlBar.scss';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import { clearGallery, toggleGroup } from '../../slices/gallery';
-import { useAppSelector, useAppDispatch } from '../../hooks';
+import { useAppSelector, useAppDispatch } from '../../core/hooks';
 
 export default function ControlBar() {
   const dispatch = useAppDispatch();

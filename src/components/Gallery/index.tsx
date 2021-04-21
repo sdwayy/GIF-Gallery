@@ -1,9 +1,10 @@
 import './Gallery.scss';
-import React from 'react';
-import { useAppSelector } from '../../hooks';
-import { ImageType } from '../../types';
+import React, { useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from '../../core/hooks';
+import { ImageType } from '../../core/types';
 import ImagesCard from './ImagesCard';
 import CardsGroup from './CardsGroup';
+import { showNotification } from '../../slices/notification';
 
 const getImagesCards = (globalImagesData: ImageType[]) => {
   const associatedIdList = globalImagesData.map((data) => data.associatedId);
@@ -41,8 +42,15 @@ const getCardsGroups = (globalImagesData: ImageType[]) => {
 };
 
 export default function Gallery() {
+  const dispatch = useAppDispatch();
   const galleryData = useAppSelector((state) => state.gallery);
-  const { images: imagesData, isGrouped } = galleryData;
+  const { images: imagesData, isGrouped, error } = galleryData;
+
+  useEffect(() => {
+    if (error) {
+      dispatch(showNotification({ source: 'gallery', text: error }));
+    }
+  }, [error]);
 
   return (
     imagesData.length > 0
