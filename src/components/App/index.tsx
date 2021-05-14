@@ -8,7 +8,7 @@ import Gallery from '../Gallery';
 import Notification from '../Notification';
 
 export default function App() {
-  const notificationIsActive: boolean = useAppSelector(
+  const notificationIsActive = useAppSelector(
     (state) => state.notification.isActive,
   );
 

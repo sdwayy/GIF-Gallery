@@ -18,18 +18,18 @@ export const getGifsData = createAsyncThunk('gallery/getGifsData', async (tags: 
 
 type LoadStateType = 'idle' | 'process' | 'rejected';
 
-type GalleryStateType = {
-  images: Array<ImageType>,
+type InitalStateType = {
+  images: ImageType[],
   isGrouped: boolean,
   load: LoadStateType,
-  error: string | undefined,
+  error: string,
 };
 
-const initialState: GalleryStateType = {
+const initialState: InitalStateType = {
   images: [],
   isGrouped: false,
   load: 'idle',
-  error: undefined,
+  error: '',
 };
 
 const gallery = createSlice({
@@ -47,7 +47,7 @@ const gallery = createSlice({
       state.load = payload;
     },
     clearGalleryError: (state) => {
-      state.error = undefined;
+      state.error = '';
     },
   },
   extraReducers: (builder) => {
@@ -69,7 +69,7 @@ const gallery = createSlice({
       state.load = 'idle';
     });
     builder.addCase(getGifsData.rejected, (state, action) => {
-      state.error = action.error.message;
+      state.error = action.error.message as string;
       state.load = 'idle';
     });
   },

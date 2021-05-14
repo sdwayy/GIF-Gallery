@@ -1,19 +1,21 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type NotificationState = {
-  isActive: boolean,
-  extra: {
-    source: string,
-    text: string,
-  }
+type ExtraType = {
+  text: string,
+  source: string,
 };
 
-const initialState: NotificationState = {
+type InitialStateType = {
+  isActive: boolean,
+  extra: ExtraType,
+};
+
+const initialState: InitialStateType = {
   isActive: false,
   extra: {
-    source: '',
     text: '',
+    source: '',
   },
 };
 
@@ -21,7 +23,7 @@ const notificationSlice = createSlice({
   name: 'notification',
   initialState,
   reducers: {
-    showNotification: (state, action: PayloadAction<{ text: string, source: string }>) => {
+    showNotification: (state, action: PayloadAction<ExtraType>) => {
       state.isActive = true;
       state.extra.text = action.payload.text;
       state.extra.source = action.payload.source;

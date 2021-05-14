@@ -2,12 +2,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { clearGallery, getGifsData } from './gallery';
 
-type InnerFormState = {
+type InitialStateType = {
   value: string
   isValid: boolean
 };
 
-const initialState: InnerFormState = {
+const initialState: InitialStateType = {
   value: '',
   isValid: true,
 };

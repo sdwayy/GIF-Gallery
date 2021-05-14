@@ -6,7 +6,7 @@ import { useAppSelector, useAppDispatch } from '../../core/hooks';
 
 export default function ControlBar() {
   const dispatch = useAppDispatch();
-  const galleryIsGrouped: boolean = useAppSelector(
+  const galleryIsGrouped = useAppSelector(
     (state) => state.gallery.isGrouped,
   );
 

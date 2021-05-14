@@ -2,10 +2,8 @@ import './InnerForm.scss';
 import React, {
   ChangeEvent, SyntheticEvent, useEffect, createRef,
 } from 'react';
-import { useSelector } from 'react-redux';
 import { Button, Form } from 'react-bootstrap';
 import { useAppSelector, useAppDispatch } from '../../core/hooks';
-import { RootState } from '../../core/store';
 import { getGifsData } from '../../slices/gallery';
 import { showNotification } from '../../slices/notification';
 import { setValue } from '../../slices/innerForm';
@@ -14,7 +12,7 @@ export default function InnerForm() {
   const dispatch = useAppDispatch();
   const formData = useAppSelector((state) => state.innerForm);
   const inputRef = createRef<HTMLInputElement>();
-  const loadState = useSelector((state: RootState) => state.gallery.load);
+  const loadState = useAppSelector((state) => state.gallery.load);
 
   const { value: formValue } = formData;
 
